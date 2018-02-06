@@ -104,7 +104,7 @@ describe("UserRepository", function() {
 
 });
 
-// Get user by ID
+// Update user
 describe("UserRepository", function() {
 
     it("should return an updated user object", function(){
@@ -176,6 +176,51 @@ describe("UserRepository", function() {
         };
 
         expect(f).toThrow('Requested user doesn\'t exist')
+    });
+
+});
+
+// Delete user
+describe("UserRepository", function() {
+
+    it("should return a user object", function(){
+
+        var mockDb = jasmine.createSpyObj('db', ['get', 'push', 'write', 'find', 'remove']);
+        mockDb.get.and.returnValue(mockDb);
+        mockDb.push.and.returnValue(mockDb);
+        mockDb.remove.and.returnValue(mockDb);
+        mockDb.write.and.returnValue({
+            id : 1,
+            firstname: 'John',
+            lastname : 'Doe',
+            birthday : '2000-01-01'
+        });
+
+        var repository = new UserRepository(mockDb);
+        var user = repository.delete(1);
+
+        expect(user).toEqual({
+            id : 1,
+            firstname: 'John',
+            lastname : 'Doe',
+            birthday : '2000-01-01'
+        })
+
+        expect(mockDb.remove).toHaveBeenCalledWith({id: 1});
+    });
+
+    it("should throw exception 'Missing user ID'", function(){
+        var mockDb = jasmine.createSpyObj('db', ['get', 'push', 'write', 'find', 'value']);
+        mockDb.get.and.returnValue(mockDb);
+        mockDb.push.and.returnValue(mockDb);
+        mockDb.find.and.returnValue(mockDb);
+        mockDb.value.and.returnValue(mockDb);
+        var repository = new UserRepository(mockDb);
+        var f = function(){
+            repository.delete();
+        };
+
+        expect(f).toThrow('Missing user ID')
     });
 
 });

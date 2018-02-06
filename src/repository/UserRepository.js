@@ -64,7 +64,10 @@ UserRepository.prototype.update = function (user) {
  * @param {number} id
  */
 UserRepository.prototype.delete = function (id) {
+    if(!id) throw "Missing user ID";
 
+    var user = this.db.get('users').remove({id: id}).write();
+    return user;
 };
 
 
