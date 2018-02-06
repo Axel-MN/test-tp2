@@ -42,7 +42,6 @@ UserRepository.prototype.findOneById = function (id) {
 
     if(!id) throw "Missing user ID";
 
-    console.log("SEARCHING FOR USER WITH ID : " + id);
     var user = this.db.get('users').find({id: id}).value();
     if(user != null) return user;
     throw "Requested user doesn't exist";
@@ -53,7 +52,11 @@ UserRepository.prototype.findOneById = function (id) {
  * @param {User} user
  */
 UserRepository.prototype.update = function (user) {
-
+    if(!user) throw "User object is undefined";
+    if(!user.id) throw "Missing user ID";
+    var updatedUser = this.db.get('users').find({id: user.id}).assign(user).write();
+    if(updatedUser != null) return updatedUser;
+    throw "Requested user doesn't exist";
 };
 
 /**
