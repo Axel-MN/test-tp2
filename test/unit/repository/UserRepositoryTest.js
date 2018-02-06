@@ -103,3 +103,79 @@ describe("UserRepository", function() {
     });
 
 });
+
+// Get user by ID
+describe("UserRepository", function() {
+
+    it("should return an updated user object", function(){
+
+        var mockDb = jasmine.createSpyObj('db', ['get', 'push', 'write', 'find', 'assign']);
+        mockDb.get.and.returnValue(mockDb);
+        mockDb.push.and.returnValue(mockDb);
+        mockDb.find.and.returnValue(mockDb);
+        mockDb.assign.and.returnValue(mockDb);
+        mockDb.write.and.returnValue({
+            id : 1,
+            firstname: 'Jesus',
+            lastname : 'Doe',
+            birthday : '2000-01-01'
+        });
+
+        var repository = new UserRepository(mockDb);
+        var user = repository.update({id: 1, firstname: 'Jesus'});
+
+        expect(user).toEqual({
+            id : 1,
+            firstname: 'Jesus',
+            lastname : 'Doe',
+            birthday : '2000-01-01'
+        })
+
+        expect(mockDb.find).toHaveBeenCalledWith({id: 1});
+        expect(mockDb.assign).toHaveBeenCalledWith({id: 1, firstname: 'Jesus'});
+    });
+
+    it("should throw exception 'User object is undefined'", function(){
+        var mockDb = jasmine.createSpyObj('db', ['get', 'push', 'write', 'find', 'value']);
+        mockDb.get.and.returnValue(mockDb);
+        mockDb.push.and.returnValue(mockDb);
+        mockDb.find.and.returnValue(mockDb);
+        mockDb.value.and.returnValue(null);
+        var repository = new UserRepository(mockDb);
+        var f = function(){
+            repository.update();
+        };
+
+        expect(f).toThrow('User object is undefined')
+    });
+
+    it("should throw exception 'Missing user ID'", function(){
+        var mockDb = jasmine.createSpyObj('db', ['get', 'push', 'write', 'find', 'value']);
+        mockDb.get.and.returnValue(mockDb);
+        mockDb.push.and.returnValue(mockDb);
+        mockDb.find.and.returnValue(mockDb);
+        mockDb.value.and.returnValue(mockDb);
+        var repository = new UserRepository(mockDb);
+        var f = function(){
+            repository.update(15);
+        };
+
+        expect(f).toThrow('Missing user ID')
+    });
+
+    it("should throw exception 'Requested user doesn't exist'", function(){
+        var mockDb = jasmine.createSpyObj('db', ['get', 'push', 'write', 'find', 'assign']);
+        mockDb.get.and.returnValue(mockDb);
+        mockDb.push.and.returnValue(mockDb);
+        mockDb.find.and.returnValue(mockDb);
+        mockDb.assign.and.returnValue(mockDb);
+        mockDb.write.and.returnValue(null);
+        var repository = new UserRepository(mockDb);
+        var f = function(){
+            repository.update({id: 1, firstname: 'Jesus'});
+        };
+
+        expect(f).toThrow('Requested user doesn\'t exist')
+    });
+
+});
